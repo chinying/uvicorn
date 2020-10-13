@@ -9,6 +9,8 @@ the connecting client, rather that the connecting proxy.
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers#Proxies
 """
 
+from typing import List
+
 
 class ProxyHeadersMiddleware:
     def __init__(self, app, trusted_hosts="127.0.0.1"):
@@ -18,6 +20,9 @@ class ProxyHeadersMiddleware:
         else:
             self.trusted_hosts = trusted_hosts
         self.always_trust = "*" in self.trusted_hosts
+
+    def get_forwarded_for_hosts(self, hosts) -> List[str]:
+        return [host.strip() for host in hosts.split(',')]
 
     async def __call__(self, scope, receive, send):
         if scope["type"] in ("http", "websocket"):
@@ -38,8 +43,10 @@ class ProxyHeadersMiddleware:
                     # X-Forwarded-For header. We've lost the connecting client's port
                     # information by now, so only include the host.
                     x_forwarded_for = headers[b"x-forwarded-for"].decode("ascii")
-                    host = x_forwarded_for.split(",")[-1].strip()
+                    x_forwarded_for_hosts = [host.strip() for host in hosts.split(',')]
+                    host = x_forwarded_for_hosts[0] if len(x_forwarded_for_hosts) > 0 else 'unknown'
+                    remote_ips=x_forwarded_for_hosts
                     port = 0
-                    scope["client"] = (host, port)
+                    scope["client"] = (host, port, remote_ips)
 
         return await self.app(scope, receive, send)
