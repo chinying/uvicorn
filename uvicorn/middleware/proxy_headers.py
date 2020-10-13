@@ -43,10 +43,12 @@ class ProxyHeadersMiddleware:
                     # X-Forwarded-For header. We've lost the connecting client's port
                     # information by now, so only include the host.
                     x_forwarded_for = headers[b"x-forwarded-for"].decode("ascii")
+                    print('X_FORWARDED_FOR', x_forwarded_for)
                     x_forwarded_for_hosts = [host.strip() for host in hosts.split(',')]
                     host = x_forwarded_for_hosts[0] if len(x_forwarded_for_hosts) > 0 else 'unknown'
                     remote_ips=x_forwarded_for_hosts
                     port = 0
+                    print(host, port, remote_ips)
                     scope["client"] = (host, port, remote_ips)
 
         return await self.app(scope, receive, send)
