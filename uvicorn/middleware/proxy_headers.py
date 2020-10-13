@@ -63,6 +63,6 @@ class ProxyHeadersMiddleware:
                     host = self.get_trusted_client_host(x_forwarded_for_hosts)
                     port = 0
                     print(host, port, remote_ips)
-                    scope["client"] = (host, port, remote_ips)
+                    scope["client"] = (host, port)
 
         return await self.app(scope, receive, send)
