@@ -58,6 +58,6 @@ class ProxyHeadersMiddleware:
                     remote_ips=x_forwarded_for
                     port = 0
                     print(host, port, remote_ips)
-                    scope["client"] = (host, port)
+                    scope["client"] = (host, port, remote_ips)
 
         return await self.app(scope, receive, send)
