@@ -9,12 +9,14 @@ the connecting client, rather that the connecting proxy.
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers#Proxies
 """
 
+import logging
 from typing import List
 
 
 class ProxyHeadersMiddleware:
     def __init__(self, app, trusted_hosts="127.0.0.1"):
         self.app = app
+        self.logger = logging.getLogger("uvicorn.asgi")
         if isinstance(trusted_hosts, str):
             self.trusted_hosts = [item.strip() for item in trusted_hosts.split(",")]
         else:
@@ -53,11 +55,11 @@ class ProxyHeadersMiddleware:
                     # X-Forwarded-For header. We've lost the connecting client's port
                     # information by now, so only include the host.
                     x_forwarded_for = headers[b"x-forwarded-for"].decode("ascii")
-                    print('X_FORWARDED_FOR', x_forwarded_for)
+                    self.logger.info("X_FORWARDED_FOR %s" % x_forwarded_for)
                     host = x_forwarded_for.split(",")[-1].strip()
                     remote_ips=x_forwarded_for
                     port = 0
-                    print(host, port, remote_ips)
+                    self.logger.info(f"host={host}, port={port}, remote_ips={remote_ips}")
                     scope["client"] = (host, port, remote_ips)
 
         return await self.app(scope, receive, send)
