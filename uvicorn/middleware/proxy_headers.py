@@ -60,6 +60,6 @@ class ProxyHeadersMiddleware:
                     remote_ips=x_forwarded_for
                     port = 0
                     self.logger.info(f"host={host}, port={port}, remote_ips={remote_ips}")
-                    scope["client"] = (host, port, remote_ips)
+                    scope["client"] = (host, port)
 
         return await self.app(scope, receive, send)
