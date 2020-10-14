@@ -55,8 +55,8 @@ class ProxyHeadersMiddleware:
                     # X-Forwarded-For header. We've lost the connecting client's port
                     # information by now, so only include the host.
                     x_forwarded_for = headers[b"x-forwarded-for"].decode("ascii")
-                    self.logger.info("X_FORWARDED_FOR %s" % x_forwarded_for)
-                    host = x_forwarded_for.split(",")[-1].strip()
+                    # self.logger.info("X_FORWARDED_FOR %s" % x_forwarded_for)
+                    host = x_forwarded_for.split(",")[0].strip()
                     remote_ips=x_forwarded_for
                     port = 0
                     self.logger.info(f"host={host}, port={port}, remote_ips={remote_ips}")
